@@ -1,4 +1,10 @@
-xterm -hold -title "Peer 55" -e "python3 cdht.py 55 66 77 300 0.3" &
-xterm -hold -title "Peer 66" -e "python3 cdht.py  66 77 110 300 0.3" &
-xterm -hold -title "Peer 77" -e "python3 cdht.py  77 110 55 300 0.3" &
-xterm -hold -title "Peer 110" -e "python3 cdht.py  110 55 66 300 0.3" &
+xterm -hold -title "Peer 56" -e "python3 cdht.py 56 67 80 300 0.3" &
+xterm -hold -title "Peer 67" -e "python3 cdht.py  67 80 130 300 0.3" &
+xterm -hold -title "Peer 80" -e "python3 cdht.py  80 130 56 300 0.3" &
+xterm -hold -title "Peer 130" -e "python3 cdht.py  130 56 67 300 0.3" &
+
+
+Things to work out:
+    handling incorrect file number inputs
+    sender / receiver log indentation
+    peer exits

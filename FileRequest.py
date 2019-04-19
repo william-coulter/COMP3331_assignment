@@ -22,10 +22,14 @@ class fileRequest(threading.Thread):
             msg = pickle.dumps(request)
         
             # send request to successor
-            s.connect(("127.0.0.1", 50000 + int(self._successor)))
+            s.connect(("127.0.0.1", 50000 + self._successor))
             s.sendall(msg)       
             
-            print('sending file request to successor')
+            # print correct messages to terminal for spec
+            if self._requestor_id == self._id:
+                print(f'File request message for {self._file_no} has been sent to my successor.')
+            else:
+                print('File request message has been forwarded to my successor.')
             
             # wait for response from eventual responder
             # data = s.recv(1024) MAYBE????

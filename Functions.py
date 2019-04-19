@@ -1,6 +1,5 @@
 from errors import fileNoInputError, check_fileno_input
 
-
 # hashes a raw file number (string type)
 # handles exceptions
 def hash(raw_file_no):
@@ -8,7 +7,7 @@ def hash(raw_file_no):
         check_fileno_input(raw_file_no)       
         return int(raw_file_no) % 256
     except fileNoInputError as error:
-        print(error.errors)
+        return error
 
 # determines if a peer is responsible for owning a particular file
 def has_file(own_id, requestor_id, successor_id, predecessor_id, hashed_file_no):
@@ -24,8 +23,6 @@ def has_file(own_id, requestor_id, successor_id, predecessor_id, hashed_file_no)
     # otherwise, we are not responsible for the file
     else:
         return False
-
-
 
 
 

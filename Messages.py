@@ -1,4 +1,7 @@
 # Message classes for pickle usage
+
+
+# Send to confirm peers are alive
 class pingMessage():
     def __init__(self, id):
         self._id = id
@@ -7,6 +10,7 @@ class pingMessage():
     def id(self):
         return self._id
 
+# Send to request file from successor
 class requestFileMessage():
     def __init__(self, requestor_id, file_no, predecessor):
         self._requestor_id = int(requestor_id)
@@ -25,6 +29,21 @@ class requestFileMessage():
     def predecessor(self):
         return self._predecessor
 
+# send once file has been located
+class responseFileMessage():
+    def __init__(self, id, file_no):
+        self._id = id
+        self._file_no = file_no
+    
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def file_no(self):
+        return self._file_no
+
+# send to transfer contents of file
 class fileTransferMessage():
     def __init__(self, file_no=None, data=None, ack_no=None, seq_no=None, MSS=None, drop_prob=None):
         self._file_no = file_no

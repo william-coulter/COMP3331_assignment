@@ -35,14 +35,24 @@ class TCPserver(threading.Thread):
 
                 # determine what to do with data
                 if type(received_msg) is requestFileMessage:
+                    
+                    # test if we have the file
                     if has_file(self._id, received_msg.requestor_id, self._successor, received_msg.predecessor, received_msg.file_no):
-                        print('I have the file')
-                        print(f'sending to {received_msg.requestor_id}')
+                        # check if the request came initially from self
+                        if self._id == received_msg.requestor_id: 
+                            print('we have the file lmao')
+                            continue
+                        
+                        # if not, send file to requestor
                         fileTransferThread = fileTransfer(self._id, received_msg.requestor_id, received_msg.file_no, self._MSS, self._drop_prob)
+                        print(f'File {received_msg.file_no} is here.')
                         fileTransferThread.start()
                         fileTransferThread.join()
+                        print('The file is sent.')
+                    
+                    # ask successor for file
                     else:
-                        # send to next successor
+                        print(f'File {received_msg.file_no} is not stored here.')
                         fileRequestThread = fileRequest(self._id, self._successor, received_msg.requestor_id, received_msg.file_no)   
                         fileRequestThread.start()
                         fileRequestThread.join()     

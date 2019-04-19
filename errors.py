@@ -1,10 +1,11 @@
+from abc import ABC
+
 class fileNoInputError(Exception):
     def __init__(self, errors, msg=None):
         if msg is None:
             msg = ""
         super().__init__(msg)
         self._errors = errors
-
 
 def check_fileno_input(file_no):
     errors = {}

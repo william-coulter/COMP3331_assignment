@@ -22,7 +22,7 @@ drop_prob       = float(sys.argv[5])
 
 # run server for rest of execution
 TCPServerThread = TCPserver(peer_id, successor_1, MSS, drop_prob)
-UDPServerThread = UDPserver(peer_id)
+UDPServerThread = UDPserver(peer_id, drop_prob)
 TCPServerThread.start()
 UDPServerThread.start()
 time.sleep(0.5)
@@ -42,17 +42,16 @@ while True:
     command = initial_input.split()[0]
     if command == "request":
         file_no = hash(initial_input.split()[1])
-        if has_file(peer_id, peer_id, successor_1, peer_id, file_no):
-            # check if we have file
-            print('we have it lmao')
-            pass
-        else :
-            fileRequestThread = fileRequest(peer_id, successor_1, peer_id, file_no)   
-            fileRequestThread.start()
-            fileRequestThread.join()     
+        # test for valid input here
+
+        
+
+        # send request to successor
+        fileRequestThread = fileRequest(peer_id, successor_1, peer_id, file_no)   
+        fileRequestThread.start()
+        fileRequestThread.join()     
 
     elif command == "break":
-        print('exiting loop')
         break
     else:
         print('invalid input')
