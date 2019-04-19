@@ -2,6 +2,9 @@ import sys
 import socket
 import threading
 import time
+import pickle
+
+from Messages import pingMessage
 
 # sends pings through UDP socket 
 class pingRequest(threading.Thread):
@@ -14,10 +17,12 @@ class pingRequest(threading.Thread):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:     
 
             # ping sends id of sender
-            msg = bytes(self._id, 'utf-8')
+            ping = pingMessage(self._id)
+            msg = pickle.dumps(ping)
             s.sendto(msg, ("127.0.0.1", 50000 + int(self._successor))) 
 
             data, address = s.recvfrom(1024)
-            print(f'A ping response message was received from Peer {self._successor}')
+            received_msg = pickle.loads(data)
+            print(f'A ping response message was received from Peer {received_msg.id}')
 
             s.close()

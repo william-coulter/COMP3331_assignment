@@ -1,7 +1,7 @@
 class fileNoInputError(Exception):
     def __init__(self, errors, msg=None):
         if msg is None:
-            msg = "Ingredient validation error occurred with fields: %s"%(', '.join(errors.keys()))
+            msg = ""
         super().__init__(msg)
         self._errors = errors
 

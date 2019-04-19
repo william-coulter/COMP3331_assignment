@@ -4,50 +4,59 @@ import sys
 import socket
 import threading
 import time
-# import pickle
 
+from TCPServer import TCPserver
+from UDPServer import UDPserver
 from PingRequest import pingRequest
-from HandlePing import handlePing
+from FileRequest import fileRequest
 
-# from Functions import hash
-# from errors import fileNoInputError, check_fileno_input
-# from Message import Message
+from Functions import hash, has_file
+
 
 # add all inputs from cmd line
-peer_id = sys.argv[1]
-successor_1 = sys.argv[2]
-successor_2 = sys.argv[3]
-MSS = int(sys.argv[4])
-drop_prob = float(sys.argv[5])
+peer_id         = int(sys.argv[1])
+successor_1     = int(sys.argv[2])
+successor_2     = int(sys.argv[3])
+MSS             = int(sys.argv[4])
+drop_prob       = float(sys.argv[5])
 
-# set-up separate threads for ping request
-HandlePingThread = handlePing(peer_id)
+# run server for rest of execution
+TCPServerThread = TCPserver(peer_id, successor_1, MSS, drop_prob)
+UDPServerThread = UDPserver(peer_id)
+TCPServerThread.start()
+UDPServerThread.start()
+time.sleep(0.5)
+
+# PUT THIS INTO A THREAD THAT CONSTANTLY CHECK STATUS OF PEERS  
+# ping successors
 PingRequestSucc1Thread = pingRequest(peer_id, successor_1)
 PingRequestSucc2Thread = pingRequest(peer_id, successor_2)
-
-# begin thread execution
-HandlePingThread.start()
-time.sleep(0.2)
 PingRequestSucc1Thread.start()
 PingRequestSucc2Thread.start()
-
-# main thread waits until ping is completed
 PingRequestSucc1Thread.join()
 PingRequestSucc2Thread.join()
-HandlePingThread.join()
 
-# main thread continues here
-print('all successors are alive')
-'''
-# Might need to loop this
+while True:
+    
+    initial_input = input()
+    command = initial_input.split()[0]
+    if command == "request":
+        file_no = hash(initial_input.split()[1])
+        if has_file(peer_id, peer_id, successor_1, peer_id, file_no):
+            # check if we have file
+            print('we have it lmao')
+            pass
+        else :
+            fileRequestThread = fileRequest(peer_id, successor_1, peer_id, file_no)   
+            fileRequestThread.start()
+            fileRequestThread.join()     
 
-file_transfer_server = threading.Thread(target=working_peer.file_transfer_server)
-file_transfer_client = threading.Thread(target=working_peer.file_transfer_client)
-file_transfer_server.start()
-time.sleep(0.2) # wait for server to setup
-file_transfer_client.start()
+    elif command == "break":
+        print('exiting loop')
+        break
+    else:
+        print('invalid input')
+        continue     
 
-file_transfer_server.join()
-file_transfer_client.join()
-
-'''
+TCPServerThread.join()
+UDPServerThread.join()
