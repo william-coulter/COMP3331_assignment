@@ -4,12 +4,12 @@ import threading
 import time
 import pickle
 
-from Messages import requestFileMessage
+from supporting.Messages import requestFileMessage
 
-# requests file from successor
+# requests file from successor over TCP
 class fileRequest(threading.Thread):
     def __init__(self, id, successor, requestor_id, file_no):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
         self._id = id
         self._successor = successor
         self._requestor_id = requestor_id

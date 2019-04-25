@@ -1,13 +1,17 @@
-from errors import fileNoInputError, check_fileno_input
-
 # hashes a raw file number (string type)
 # handles exceptions
 def hash(raw_file_no):
+    # check valid input
     try:
-        check_fileno_input(raw_file_no)       
-        return int(raw_file_no) % 256
-    except fileNoInputError as error:
-        return error
+        int(raw_file_no)
+    except:
+        return None
+    
+    file_no = int(raw_file_no)
+    if file_no < 0 or file_no > 9999:
+        return None
+
+    return file_no % 256
 
 # determines if a peer is responsible for owning a particular file
 def has_file(own_id, requestor_id, successor_id, predecessor_id, hashed_file_no):
@@ -23,6 +27,11 @@ def has_file(own_id, requestor_id, successor_id, predecessor_id, hashed_file_no)
     # otherwise, we are not responsible for the file
     else:
         return False
+
+# writes to an open log
+def write_to_log(open_log_file, event=None, time=None, seq=0, no_bytes=0, ack=0):
+    open_log_file.write(f'{event}\t\t\t {time}\t\t\t {seq}\t\t\t {no_bytes}\t\t\t {ack}\n')
+
 
 
 

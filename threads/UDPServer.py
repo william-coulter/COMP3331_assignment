@@ -3,52 +3,60 @@ import socket
 import threading
 import time
 import pickle
-import random
 
-from Messages import pingMessage, fileTransferMessage, responseFileMessage
+from supporting.Messages import pingMessage, fileTransferMessage, responseFileMessage
+from supporting.Functions import write_to_log
 
-# binds to a UDP socket that handles pings
+# binds to a UDP socket that handles messages
 class UDPserver(threading.Thread):
-    def __init__(self, id, drop_prob):
-        threading.Thread.__init__(self)
+    def __init__(self, id, successors, predecessors):
+        threading.Thread.__init__(self, daemon=True)
         self._id = id
-        self._drop_prob = drop_prob
+        self._successors = successors
+        self._predecessors = predecessors
         
     def run(self):           
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 
             s.bind(("127.0.0.1", 50000 + self._id))
             
+            # CHECK TYPE OF MESSAGE RECEIVED
             while True:
                 data, addr = s.recvfrom(1024)
                 received_msg = pickle.loads(data)
                 
-                # check if ping was received
+                # IF PING MESSAGE WAS RECEIVED
                 if type(received_msg) is pingMessage:
-                    print(f'A ping request message was received from Peer {received_msg.id}')
                     
+                    if received_msg.seq_no == 0: 
+                        print(f'A ping request message was received from Peer {received_msg.id}')
+                    
+                    # keep track of predecessor
+                    if received_msg.is_immediate:
+                        self._predecessors[0] = received_msg.id
+                    else:
+                        self._predecessors[1] = received_msg.id
+
                     # send ACK
-                    ping = pingMessage(self._id)
+                    ping = pingMessage(self._id, received_msg.seq_no)
                     msg = pickle.dumps(ping)
                     s.sendto(msg, addr)
 
+                # IF MESSAGE WANTS TO CONFIRM WE CAN RECEIVE FILE
                 elif type(received_msg) is responseFileMessage:
                     response_message = responseFileMessage(self._id, received_msg.file_no)
                     msg = pickle.dumps(response_message)
                     s.sendto(msg, addr)
+
                     print(f'Received a response message from peer {received_msg.id}, which has the file {received_msg.file_no}.')
 
+                # IF MESSAGE WANTS US TO START ACCEPTING THE FILE 
                 elif type(received_msg) is fileTransferMessage:
                     with open('requesting_log.txt', 'a') as requesting_log:
 
-                        # test if packet was lost
-                        #if random.uniform(0, 1) < self._drop_prob:
-                            #print('oops, lost this packet')
-                            #continue
-                        
                         now = round(time.time(), 2)
 
-                        if received_msg.ack_no == 0:
+                        if received_msg.seq_no == 1:
                             print('We now start receiving the file .........')
 
                         if received_msg.ack_no == 'final ack':
@@ -60,11 +68,12 @@ class UDPserver(threading.Thread):
                         seq_no = received_msg.seq_no
                         no_bytes = sys.getsizeof(received_msg.data) 
                         ack_no = received_msg.ack_no
-                        requesting_log.write(f'{event}\t\t\t {now}\t\t\t {seq_no}\t\t\t {no_bytes}\t\t\t {ack_no}\n')
+                        write_to_log(requesting_log, event, now, seq_no, no_bytes, ack_no)
 
                         # open file to store in
                         with open(f'new_{received_msg.file_no}' + '.pdf', 'ab') as received_file:
                             
+                            # store in new file
                             received_file.write(received_msg.data)
                             
                             # send ACK                       
@@ -76,5 +85,4 @@ class UDPserver(threading.Thread):
                             # write to log that ack was sent
                             now = round(time.time(), 2)
                             event = 'snd'
-                            seq_no = 0
-                            requesting_log.write(f'{event}\t\t\t {now}\t\t\t {seq_no}\t\t\t {no_bytes}\t\t\t {ack_no}\n')
+                            write_to_log(requesting_log, event, now, 0, no_bytes, ack_no)
