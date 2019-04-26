@@ -24,7 +24,7 @@ class ping(threading.Thread):
             PingRequestSucc2Thread.join()
             
             ping_seq_no += 1
-            time.sleep(2)
+            time.sleep(1)
 
 
 
