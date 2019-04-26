@@ -39,8 +39,7 @@ class pingRequest(threading.Thread):
             try:
                 data, address = s.recvfrom(1024)
                 received_msg = pickle.loads(data)
-                if received_msg.seq_no == 0:
-                    print(f'A ping response message was received from Peer {received_msg.id}')
+                print(f'A ping response message was received from Peer {received_msg.id}')
                 self._most_recent_seq_no[0] = received_msg.seq_no
             
             # if timeout occurs, check if this is the 4th time

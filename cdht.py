@@ -73,10 +73,6 @@ while True:
 
         # not sure how to exit terminal
         sys.exit()
-
-    elif command == "predecessor":
-        print(f'my predecessors are: {predecessors}')
-
     else:
         print('invalid input')
         continue     

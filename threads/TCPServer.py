@@ -72,8 +72,6 @@ class TCPserver(threading.Thread):
 
                 # IF MESSAGE IS INFORMING US OF NEW PREDECESSORS
                 elif type(received_msg) is newPredecessorMessage:
-                    print(f'first is: {received_msg.new_predecessors[0]}')
-                    print(f'second is: {received_msg.new_predecessors[1]}')
                     self._predecessors[0] = received_msg.new_predecessors[0]
                     self._predecessors[1] = received_msg.new_predecessors[1]
                 

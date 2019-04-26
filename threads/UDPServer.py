@@ -28,8 +28,7 @@ class UDPserver(threading.Thread):
                 # IF PING MESSAGE WAS RECEIVED
                 if type(received_msg) is pingMessage:
                     
-                    if received_msg.seq_no == 0: 
-                        print(f'A ping request message was received from Peer {received_msg.id}')
+                    print(f'A ping request message was received from Peer {received_msg.id}')
                     
                     # keep track of predecessor
                     if received_msg.is_immediate:
